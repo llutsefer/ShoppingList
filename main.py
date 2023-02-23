@@ -1,4 +1,5 @@
 import customtkinter
+import pickle
 
 customtkinter.set_appearance_mode("Dark")
 customtkinter.set_default_color_theme("dark-blue")
@@ -10,9 +11,12 @@ root.title("Shopping list")
 main_frame = customtkinter.CTkFrame(master=root)
 main_frame.pack(pady=20, padx=60, fill="both", expand=True)
 
+shopping_list = []
+
 
 def save_data_from_top_level_window_to_list(name_entry, approximate_cost_entry, amount_entry):
-    shopping_list.append(itemToBuy(name_entry.get(), float(approximate_cost_entry.get()), amount_entry.get()))
+    shopping_list.append(
+        item_to_buy(name_entry.get(), float(approximate_cost_entry.get()), amount_entry.get(), False))
 
 
 def close_add_new_item_top_level_window(window, name_entry, approximate_cost_entry, amount_entry):
@@ -42,8 +46,10 @@ def open_add_new_item_top_level_window():
 
     save_new_item_button = customtkinter.CTkButton(master=window, fg_color="#700B97", text="Add new item",
                                                    font=("GajrajOne", 30),
-                                                   command=lambda: close_add_new_item_top_level_window(window, name_entry,
-                                                                                                       approximate_cost_entry, amount_entry))
+                                                   command=lambda: close_add_new_item_top_level_window(window,
+                                                                                                       name_entry,
+                                                                                                       approximate_cost_entry,
+                                                                                                       amount_entry))
     save_new_item_button.pack(pady=12, padx=20, fill="both")
 
 
@@ -52,12 +58,12 @@ add_new_item_button = customtkinter.CTkButton(master=main_frame, fg_color="#700B
 add_new_item_button.pack(pady=12, padx=20, fill="both")
 
 
-class itemToBuy:
-    def __init__(self, name_of_item: str, approximate_cost: float, amount: str):
-        self.__name_of_item = name_of_item
-        self.__approximate_cost = approximate_cost
-        self.__amount = amount
-        self.already_bought = False
+class item_to_buy:
+    def __init__(self, name_of_item: str, approximate_cost: float, amount: str, already_bought: bool):
+        self.name_of_item = name_of_item
+        self.approximate_cost = approximate_cost
+        self.amount = amount
+        self.already_bought = already_bought
 
         self.product_frame = customtkinter.CTkFrame(master=main_frame, fg_color="#3E065F")
         self.product_frame.pack(pady=12, padx=20, fill="both")
@@ -68,9 +74,9 @@ class itemToBuy:
         self.already_bought_check_box.grid(row=0, column=0, padx=(30, 0), pady=12)
 
         self.name_of_item_label = customtkinter.CTkLabel(master=self.product_frame,
-                                                         text=self.__name_of_item + " — " + str(
-                                                             self.__approximate_cost) + " $ — " + str(
-                                                             self.__amount), font=("GajrajOne", 50))
+                                                         text=self.name_of_item + " — " + str(
+                                                             self.approximate_cost) + " $ — " + str(
+                                                             self.amount), font=("GajrajOne", 50))
 
         self.name_of_item_label.grid(row=0, column=1, pady=12)
 
@@ -85,7 +91,37 @@ class itemToBuy:
             self.product_frame.configure(fg_color="#3E065F")
 
 
-shopping_list = [itemToBuy("Milk", 4.43, "1 bottle"), itemToBuy('Bread', 2.5, '1 loaf'), itemToBuy('Cheese', 4.0, '8 oz')]
+class item_to_buy_to_store:
+    def __init__(self, name_of_item: str, approximate_cost: float, amount: str, already_bought: bool):
+        self.name_of_item = name_of_item
+        self.approximate_cost = approximate_cost
+        self.amount = amount
+        self.already_bought = already_bought
 
+
+def get_data_from_file():
+    try:
+        data_file_read = open("data.txt", 'rb')
+    except FileNotFoundError:
+        print('Problems opening the file')
+        return
+
+    temporary_receiving_data_list = pickle.load(data_file_read)
+    data_file_read.close()
+    for j in temporary_receiving_data_list:
+        shopping_list.append(item_to_buy(j.name_of_item, j.approximate_cost, j.amount, j.already_bought))
+
+
+get_data_from_file()
 
 root.mainloop()
+
+temporary_sending_data_list = []
+for i in shopping_list:
+    temporary_sending_data_list.append(item_to_buy_to_store(i.name_of_item, i.approximate_cost, i.amount, i.already_bought))
+try:
+    data_file_write = open("data.txt", 'wb')
+    pickle.dump(temporary_sending_data_list, data_file_write)
+    data_file_write.close()
+except FileNotFoundError:
+    print('Problems opening the file')
