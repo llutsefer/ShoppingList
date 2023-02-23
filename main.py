@@ -8,7 +8,7 @@ root = customtkinter.CTk()
 root.geometry("1920x1080")
 root.title("Shopping list")
 
-main_frame = customtkinter.CTkFrame(master=root)
+main_frame = customtkinter.CTkScrollableFrame(master=root)
 main_frame.pack(pady=20, padx=60, fill="both", expand=True)
 
 shopping_list = []
@@ -125,3 +125,5 @@ try:
     data_file_write.close()
 except FileNotFoundError:
     print('Problems opening the file')
+
+# shopping_list = [item_to_buy("Milk", 4.43, "1 bottle", False), #                  item_to_buy('Bread', 2.5, '1 loaf', False), item_to_buy('Cheese', 4.0, '8 oz', False)]
