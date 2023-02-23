@@ -80,6 +80,11 @@ class item_to_buy:
 
         self.name_of_item_label.grid(row=0, column=1, pady=12)
 
+        # checking if this item has already been bought
+        if self.already_bought:
+            self.product_frame.configure(fg_color="green")
+            self.already_bought_check_box.select()
+
     def buy(self):
         if not self.already_bought:
             self.already_bought_check_box.select()
@@ -125,5 +130,3 @@ try:
     data_file_write.close()
 except FileNotFoundError:
     print('Problems opening the file')
-
-# shopping_list = [item_to_buy("Milk", 4.43, "1 bottle", False), #                  item_to_buy('Bread', 2.5, '1 loaf', False), item_to_buy('Cheese', 4.0, '8 oz', False)]
